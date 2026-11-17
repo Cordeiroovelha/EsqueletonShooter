@@ -1,38 +1,88 @@
 #include <raylib.h>
-#include <deque>
 #include <raymath.h>
+#include <algorithm>
+#include <vector>
 
-constexpr int scream_width{950}, scream_height{550};
+constexpr int scream_width{900}, scream_height{480};
 constexpr Color green = {173, 204, 96, 255};
 constexpr Color darkGreen = {43, 51, 24, 255};
 double lastUpdateTime{0};
 
-class Player {
-private:
-    
+class Bullet {
 public:
+    Vector2 position;
+    float speed{12};
+    bool active{true};
 
-    float x{scream_width / 2};
-    float y{scream_height / 2};
-    int speed{3};
+    Bullet(Vector2 startPosition)
+        : position(startPosition) {}
+
+    void Update(){
+        position.x += speed;
+        if(position.x > scream_width){
+            active = false;
+        }
+    }
 
     void Draw(){
-        DrawRectangle(x, y, 30, 30, WHITE);
+        if(active){
+            DrawRectangle(static_cast<int>(position.x), static_cast<int>(position.y), 16, 6, YELLOW);
+        }
+    }
+};
+
+class Player {
+private:
+    Texture2D texture;
+public:
+    int x{scream_width / 2};
+    int y{scream_height / 2};
+    int speed{6};
+    std::vector<Bullet> bullets;
+
+    void Draw(){
+        DrawTexture(texture, x, y, WHITE);
     }
 
     void Update(int pos){
         
     }
 
+    void Shoot(){
+        bullets.emplace_back(Vector2{
+            static_cast<float>(x + texture.width / 2 + (texture.width / 2)),
+            static_cast<float>(y + texture.height / 2)
+        });
+    }
+
+    void UpdateBullets(){
+        for(Bullet &bullet : bullets){
+            bullet.Update();
+        }
+
+        bullets.erase(
+            std::remove_if(bullets.begin(), bullets.end(),
+                [](const Bullet &bullet){ return !bullet.active; }),
+            bullets.end()
+        );
+    }
+
+    void DrawBullets(){
+        for(Bullet &bullet : bullets){
+            bullet.Draw();
+        }
+    }
+
     void Collision(){
-        if(y + 30 >= GetScreenHeight()){
-		y = GetScreenHeight() - 30;
+
+    if(y + texture.height >= GetScreenHeight()){
+		y = GetScreenHeight() - texture.height;
 	}
 	if(y <= 0){
 		y = 0;
 	}
-	if (x + 30 >= GetScreenWidth()){
-		x = GetScreenWidth() - 30;
+	if (x + texture.width >= GetScreenWidth()){
+		x = GetScreenWidth() - texture.width;
 	}
 	if (x <= 0){
 		x = 0;
@@ -42,6 +92,14 @@ public:
     void Reset(){
         
     }
+
+    Player(){
+        Image image = LoadImage("Graphics/Player.png");
+        texture = LoadTextureFromImage(image);
+        UnloadImage(image);
+    }
+
+    ~Player() { UnloadTexture(texture); }
 };
 
 class Enemy {
@@ -78,9 +136,17 @@ public:
 
     void Draw(){
         player.Draw();
+        player.DrawBullets();
     }
 
     void Update(){
+
+        if(IsKeyPressed(KEY_Z)){
+            player.Shoot();
+        }
+
+        player.UpdateBullets();
+
         if (IsKeyDown(KEY_UP)){
             player.y -= player.speed;
             player.Collision();
@@ -149,7 +215,7 @@ int main() {
         
         // Drawing
         BeginDrawing();
-        ClearBackground(BLACK);
+        ClearBackground(GRAY);
         // UI
         DrawText("Score:", scream_height - 60 , 16, 32, darkGreen);
         DrawText(TextFormat("%i", game.score), scream_height - 90 , 16, 32, darkGreen);
