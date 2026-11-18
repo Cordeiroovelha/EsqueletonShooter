@@ -3,12 +3,26 @@
 #include "Bullet.hpp"
 #include "Player.hpp"
 
-void Player::Draw(){
-    DrawTextureRec(texture, frameRec,
+void Player::Draw(bool facingLeft){
+    const Texture2D &texture = isMoving ? textureWalk : textureIdle;
+    Rectangle source = frameRec;
+    if(facingLeft){
+        source.x += source.width;
+        source.width = -source.width;
+    }
+
+    DrawTextureRec(texture, source,
         Vector2{static_cast<float>(x), static_cast<float>(y)}, WHITE);
 }
 
-void Player::Update(){
+void Player::Update(bool moving){
+    if(isMoving != moving){
+        isMoving = moving;
+        currentFrame = 0;
+        frameCounter = 0;
+        frameRec.x = 0;
+    }
+
     frameCounter++;
 
     if(frameCounter >= (60/frameSpeed)){
@@ -19,11 +33,12 @@ void Player::Update(){
     }
 }
 
-void Player::Shoot(){
+void Player::Shoot(bool facingLeft){
     bullets.emplace_back(Vector2{
-        static_cast<float>(x) + frameRec.width,
+        facingLeft ? static_cast<float>(x) - 16.0f
+                   : static_cast<float>(x) + frameRec.width,
         static_cast<float>(y) + frameRec.height / 2
-    });
+    }, facingLeft);
 }
 
 void Player::UpdateBullets(){
@@ -65,7 +80,11 @@ void Reset(){
 }
 
 Player::Player()
-    : texture(LoadTexture("Graphics/Player_idle.png")),
-        frameRec{0, 0, static_cast<float>(texture.width) / 6, static_cast<float>(texture.height)} {}
+    : textureIdle(LoadTexture("Graphics/PlayerIdle.png")),
+      textureWalk(LoadTexture("Graphics/PlayerWalk.png")),
+        frameRec{0, 0, static_cast<float>(textureIdle.width) / 6, static_cast<float>(textureIdle.height)} {}
 
-Player::~Player() { UnloadTexture(texture); }
+Player::~Player() {
+    UnloadTexture(textureIdle);
+    UnloadTexture(textureWalk);
+}

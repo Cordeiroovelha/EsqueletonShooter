@@ -1,13 +1,13 @@
 #include "Bullet.hpp"
 #include <raylib.h>
 
-Bullet::Bullet(Vector2 startPosition) : 
-    position(startPosition) {}
+Bullet::Bullet(Vector2 startPosition, bool movingLeft)
+    : position(startPosition), movingLeft(movingLeft) {}
 
 
 void Bullet::Update(){
-    position.x += speed;
-    if(position.x > GetScreenWidth()){
+    position.x += movingLeft ? -speed : speed;
+    if(position.x > GetScreenWidth() || position.x + 16 < 0){
         active = false;
     }
 }

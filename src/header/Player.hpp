@@ -7,20 +7,22 @@
 
 class Player {
 private:
-    Texture2D texture{};
+    Texture2D textureIdle{};
+    Texture2D textureWalk{};
+    bool isMoving{false};
 public:
     int x{GetScreenWidth() / 2};
     int y{GetScreenHeight() / 2};
     int speed{6};
     Rectangle frameRec{};
-    int frameSpeed{3}, frameCounter{0}, currentFrame{0};
+    int frameSpeed{4}, frameCounter{0}, currentFrame{0};
     std::vector<Bullet> bullets;
 
-    void Draw();
+    void Draw(bool facingLeft);
 
-    void Update();
+    void Update(bool moving);
 
-    void Shoot();
+    void Shoot(bool facingLeft);
 
     void UpdateBullets();
 

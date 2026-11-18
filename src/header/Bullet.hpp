@@ -8,8 +8,9 @@ public:
     Vector2 position;
     float speed{12};
     bool active{true};
+    bool movingLeft{false};
 
-    Bullet(Vector2 startPosition);
+    Bullet(Vector2 startPosition, bool movingLeft);
 
     void Update();
 
