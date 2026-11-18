@@ -1,5 +1,7 @@
-# Snake
-A repository dedicated to showcase some test with the `Raylib` library, in this case a interpretation of the game *Snake(1997)* for the *Nokia 6110*
+# Skeleton shooter
+
+A repository dedicated to showcase some test with the `Raylib` library
+**MakeFile line 373 and 253**
 
 ## How To Use
 
@@ -12,5 +14,5 @@ if you want just to test the game there is the `.exe` file in the project but, i
 * Compile the project with the `F5` key or with the following command
 
 ```bash
-C:\raylib\w64devkit\bin\mingw32-make.exe RAYLIB_PATH=C:/raylib/raylib PROJECT_NAME=main OBJS=main.cpp BUILD_MODE=DEBUG
+C:\raylib\w64devkit\bin\mingw32-make.exe RAYLIB_PATH=C:/raylib/raylib PROJECT_NAME=main BUILD_MODE=DEBUG
 ```
