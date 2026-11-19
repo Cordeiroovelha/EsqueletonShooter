@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include "Enemy.hpp"
+#include "Bullet.hpp"
 
 // Vector2{static_cast<float>(GetRandomValue(0, GetScreenHeight())), 
 //             static_cast<float>(GetScreenWidth()) + 10}, WHITE);
@@ -18,6 +19,7 @@ void Enemy::Update(){
         return;
     }
 
+    // Walk to the left
     position.x -= speed;
     frameCounter++;
     if (frameCounter >= 60 / frameSpeed) {
@@ -30,13 +32,17 @@ void Enemy::Update(){
         active = false;
     }
 }
-
+// new Enemy
 void Enemy::New(){
     position = GenerateRandomPos();
     frameCounter = 0;
     currentFrame = 0;
     frameRec.x = 0;
     active = true;
+}
+
+void Enemy::Deactivate(){
+    active = false;
 }
 
 Vector2 Enemy::GenerateRandomPos(){

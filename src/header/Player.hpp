@@ -1,6 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+/* Player Header:
+   Header dedicated to the player
+*/
+
 #include <raylib.h>
 #include "Bullet.hpp"
 #include <vector>

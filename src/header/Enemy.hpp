@@ -1,6 +1,10 @@
 #ifndef ENEMY_HPP
 #define ENEMY_HPP
 
+/* Enemy Header:
+   Header dedicated to the enemy (only one for now)
+*/
+
 #include <raylib.h>
 class Enemy {
 private:
@@ -19,6 +23,8 @@ public:
     void Update();
 
     void New();
+
+    void Deactivate();
 
     Vector2 GenerateRandomPos();
 

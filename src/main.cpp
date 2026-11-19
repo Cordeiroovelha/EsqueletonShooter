@@ -28,8 +28,8 @@ int main() {
         BeginDrawing();
         ClearBackground(GRAY);
         // UI
-        DrawText("Score:", scream_height - 60 , 16, 32, darkGreen);
-        DrawText(TextFormat("%i", game.score), scream_height - 90 , 16, 32, darkGreen);
+        DrawText("Score:", scream_height - 140 , 16, 32, darkGreen);
+        DrawText(TextFormat("%i", game.score), scream_height - 10 , 16, 32, darkGreen);
         // Objs
         game.Draw();
         EndDrawing();

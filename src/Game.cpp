@@ -1,10 +1,13 @@
 #include <raylib.h>
+#include <cstddef>
 #include "Game.hpp"
 #include "Player.hpp"
+#include "Bullet.hpp"
 #include "Enemy.hpp"
 
-namespace {
-constexpr float enemySpawnInterval = 1.0f;
+namespace { // SpawInterval
+constexpr float enemySpawnInterval = 3.0f;
+constexpr float enemyHitRespawnInterval = 1.0f;
 }
 
 void Game::Draw(){
@@ -17,21 +20,31 @@ void Game::Draw(){
 }
 
 void Game::Update(){
-    enemySpawnTimer += GetFrameTime();
+    // Enemy Update
+    const float frameTime = GetFrameTime();
+    enemySpawnTimer += frameTime;
     if (enemySpawnTimer >= enemySpawnInterval) {
-        for (Enemy &enemy : enemies) {
-            if (!enemy.IsActive()) {
-                enemy.New();
+        for (std::size_t i = 0; i < enemies.size(); ++i) {
+            if (!enemies[i].IsActive() && enemyHitRespawnTimers[i] <= 0.0f) {
+                enemies[i].New();
                 enemySpawnTimer = 0.0f;
                 break;
             }
         }
     }
 
-    for (Enemy &enemy : enemies) {
-        enemy.Update();
+    for (std::size_t i = 0; i < enemies.size(); ++i) {
+        if (enemyHitRespawnTimers[i] > 0.0f) {
+            enemyHitRespawnTimers[i] -= frameTime;
+            if (enemyHitRespawnTimers[i] <= 0.0f) {
+                enemyHitRespawnTimers[i] = 0.0f;
+                enemies[i].New();
+            }
+        }
+        enemies[i].Update();
     }
 
+    // Player Moviment
     bool moving = false;
 
     if(IsKeyPressed(KEY_Z)){
@@ -39,6 +52,7 @@ void Game::Update(){
     }
 
     player.UpdateBullets();
+    EnemyColissionWhithBullet();
 
     if (IsKeyDown(KEY_UP)){
         player.y -= player.speed;
@@ -72,6 +86,43 @@ void Game::Update(){
 
 void Game::CheckCollisionsWithEnemy(){
         
+}
+
+void Game::EnemyColissionWhithBullet(){
+    for (std::size_t i = 0; i < enemies.size(); ++i) {
+        Enemy &enemy = enemies[i];
+        if (!enemy.IsActive()) {
+            continue;
+        }
+
+        const Rectangle enemyBounds{
+            enemy.position.x,
+            enemy.position.y,
+            enemy.frameRec.width,
+            enemy.frameRec.height
+        };
+
+        for (Bullet &bullet : player.bullets) {
+            if (!bullet.active) {
+                continue;
+            }
+
+            const Rectangle bulletBounds{
+                bullet.position.x,
+                bullet.position.y,
+                bullet.frameRec.width,
+                bullet.frameRec.height
+            };
+
+            if (CheckCollisionRecs(bulletBounds, enemyBounds)) {
+                bullet.active = false;
+                score += 1;
+                enemy.Deactivate();
+                enemyHitRespawnTimers[i] = enemyHitRespawnInterval;
+                break;
+            }
+        }
+    }
 }
 
 void Game::CheckCollisionsWithWall(){

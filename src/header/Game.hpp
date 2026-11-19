@@ -8,7 +8,8 @@
 
 class Game {
 private:
-    std::array<Enemy, 5> enemies;
+    std::array<Enemy, 5> enemies; // 5 Enemys on the scream MAX
+    std::array<float, 5> enemyHitRespawnTimers{};
     float enemySpawnTimer{0.0f};
 public:
     Player player;
@@ -26,6 +27,8 @@ public:
     void CheckCollisionsWithWall();
 
     void CheckCollisionsWithBody();
+
+    void EnemyColissionWhithBullet();
 
     void GameOver();
 
