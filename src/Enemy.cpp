@@ -57,6 +57,13 @@ bool Enemy::IsActive() const{
     return active;
 }
 
+void Enemy::restart(){
+    Deactivate();
+    frameCounter = 0;
+    currentFrame = 0;
+    frameRec.x = 0;
+}
+
 Enemy::Enemy() : texture(LoadTexture("Graphics/Enemy.png")),
         frameRec{0, 0, static_cast<float>(texture.width) / 4, static_cast<float>(texture.height)} {}
 

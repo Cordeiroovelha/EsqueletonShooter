@@ -3,22 +3,26 @@
 
 #include <raylib.h>
 #include <array>
+#include <deque>
 #include "Player.hpp"
 #include "Enemy.hpp"
 
 class Game {
 private:
-    std::array<Enemy, 5> enemies; // 5 Enemys on the scream MAX
-    std::array<float, 5> enemyHitRespawnTimers{};
+    std::deque<Enemy> enemies;
+    std::deque<float> enemyHitRespawnTimers;
     float enemySpawnTimer{0.0f};
 public:
     Player player;
 
     bool running = true;
     bool left = false;
+    bool GameRuning = false;
     int score = 0;
 
     void Draw();
+
+    void Start();
 
     void Update();
 

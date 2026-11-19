@@ -6,6 +6,7 @@
 #include "Enemy.hpp"
 
 namespace { // SpawInterval
+constexpr std::size_t initialEnemyLimit = 5;
 constexpr float enemySpawnInterval = 3.0f;
 constexpr float enemyHitRespawnInterval = 1.0f;
 }
@@ -19,12 +20,28 @@ void Game::Draw(){
     }
 }
 
+void Game::Start(){
+    if (GameRuning) {
+        return;
+    }
+
+    GameRuning = true;
+    enemySpawnTimer = 0.0f;
+    enemies[0].New();
+}
+
 void Game::Update(){
+    if (!GameRuning) {
+        return;
+    }
+
     // Enemy Update
     const float frameTime = GetFrameTime();
+    const std::size_t maxEnemiesOnScreen =
+        initialEnemyLimit + static_cast<std::size_t>(score / 10);
     enemySpawnTimer += frameTime;
     if (enemySpawnTimer >= enemySpawnInterval) {
-        for (std::size_t i = 0; i < enemies.size(); ++i) {
+        for (std::size_t i = 0; i < maxEnemiesOnScreen; ++i) {
             if (!enemies[i].IsActive() && enemyHitRespawnTimers[i] <= 0.0f) {
                 enemies[i].New();
                 enemySpawnTimer = 0.0f;
@@ -55,42 +72,70 @@ void Game::Update(){
     EnemyColissionWhithBullet();
 
     if (IsKeyDown(KEY_UP)){
-        player.y -= player.speed;
+        GameRuning = true;
+        player.position.y -= player.speed;
         player.Collision();
         running = true;
         moving = true;
     }
     if (IsKeyDown(KEY_DOWN)){
-        player.y += player.speed;
+        GameRuning = true;
+        player.position.y += player.speed;
         player.Collision();
         running = true;
         moving = true;
     }   
     if (IsKeyDown(KEY_LEFT)){
-        player.x -= player.speed;
+        GameRuning = true;
+        player.position.x -= player.speed;
         player.Collision();
         running = true;
         moving = true;
         left = true;
     }
     if (IsKeyDown(KEY_RIGHT)){
-        player.x += player.speed;
+        GameRuning = true;
+        player.position.x += player.speed;
         player.Collision();
         running = true;
         moving = true;
         left = false;
     }
 
-    player.x -= 3;
+    player.position.x -= 3;
     player.Collision();
     player.Update(moving);
+    CheckCollisionsWithEnemy();
 }
 
 void Game::CheckCollisionsWithEnemy(){
-        
+    for (std::size_t i = 0; i < enemies.size(); ++i) {
+        Enemy &enemy = enemies[i];
+        if (!enemy.IsActive()) {
+            continue;
+        }
+
+        const Rectangle enemyBounds{
+            enemy.position.x,
+            enemy.position.y,
+            enemy.frameRec.width,
+            enemy.frameRec.height
+        };
+
+        const Rectangle playerBounds{
+            player.position.x,
+            player.position.y,
+            player.frameRec.width,
+            player.frameRec.height
+        };
+
+        if(CheckCollisionRecs(enemyBounds, playerBounds)){
+            GameOver();
+        }
+    }
 }
 
-void Game::EnemyColissionWhithBullet(){
+void Game::EnemyColissionWhithBullet() {
     for (std::size_t i = 0; i < enemies.size(); ++i) {
         Enemy &enemy = enemies[i];
         if (!enemy.IsActive()) {
@@ -119,6 +164,12 @@ void Game::EnemyColissionWhithBullet(){
             if (CheckCollisionRecs(bulletBounds, enemyBounds)) {
                 bullet.active = false;
                 score += 1;
+                const std::size_t maxEnemyCount =
+                    initialEnemyLimit + static_cast<std::size_t>(score / 10);
+                if (score % 10 == 0 && enemies.size() < maxEnemyCount) {
+                    enemies.emplace_back();
+                    enemyHitRespawnTimers.push_back(0.0f);
+                }
                 enemy.Deactivate();
                 enemyHitRespawnTimers[i] = enemyHitRespawnInterval;
                 break;
@@ -127,21 +178,22 @@ void Game::EnemyColissionWhithBullet(){
     }
 }
 
-void Game::CheckCollisionsWithWall(){
-        
-}
-
-void Game::CheckCollisionsWithBody(){
-        
-}
-
 void Game::GameOver(){
-        
+    score = 0;
+    GameRuning = false;
+    enemySpawnTimer = 0.0f;
+
+    for (std::size_t i = 0; i < enemies.size(); ++i) {
+        enemies[i].restart();
+        enemyHitRespawnTimers[i] = 0.0f;
+    }
+
+    player.Reset();
 }
 
-Game::Game() {
-    enemies[0].New();
-}
+Game::Game()
+    : enemies(initialEnemyLimit),
+      enemyHitRespawnTimers(initialEnemyLimit, 0.0f) {}
 
 Game::~Game()
 {

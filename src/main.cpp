@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <raymath.h>
+#include <array>
 #include "Game.hpp"
 
 constexpr int scream_width{900}, scream_height{480};
@@ -14,9 +15,10 @@ int main() {
 
     Font font;
     int spacings = 2;
-    Vector2 positions;
+    std::array<Vector2, 2> positions;
     font = LoadFont("Graphics/alagard.png");
-    positions = {scream_height - 140 , 20};
+    positions[0] = {scream_height - 140 , 20};
+    positions[1] = {scream_height - 10 , 20};
 
     Texture2D BackGround = LoadTexture("Graphics/BackGround.png");
     float scrollingBackground = 0.0f;
@@ -26,11 +28,22 @@ int main() {
 
     // Game Loop
     while (!WindowShouldClose()) {
+        if (!game.GameRuning &&
+            (GetKeyPressed() != 0 ||
+             IsKeyPressed(KEY_UP) ||
+             IsKeyPressed(KEY_DOWN) ||
+             IsKeyPressed(KEY_LEFT) ||
+             IsKeyPressed(KEY_RIGHT) ||
+             IsKeyPressed(KEY_Z))) {
+            game.Start();
+        }
+
         // Updating Positions
-        if(game.running)
+        if (game.GameRuning && game.running) {
             game.Update();
+        }
         
-        if (BackGround.id != 0) {
+        if (game.GameRuning && BackGround.id != 0) {
             scrollingBackground -= backgroundSpeed * GetFrameTime();
             if (scrollingBackground <= -static_cast<float>(BackGround.width)) {
                 scrollingBackground += static_cast<float>(BackGround.width);
@@ -49,8 +62,8 @@ int main() {
         game.Draw();
 
         // UI
-        DrawTextEx(font, "Score:", positions, 40, spacings, WHITE);
-        DrawText(TextFormat("%i", game.score), scream_height - 10 , 20, 32, WHITE);
+        DrawTextEx(font, "SCORE:", positions[0], 40, spacings, WHITE);
+        DrawTextEx(font, TextFormat("%i", game.score), positions[1], 40, spacings, WHITE);
 
         EndDrawing();
     }

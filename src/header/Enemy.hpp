@@ -29,6 +29,8 @@ public:
     Vector2 GenerateRandomPos();
 
     bool IsActive() const;
+    
+    void restart();
 
     Enemy();
 

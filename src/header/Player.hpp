@@ -15,8 +15,7 @@ private:
     Texture2D textureWalk{};
     bool isMoving{false};
 public:
-    int x{GetScreenWidth() / 2};
-    int y{GetScreenHeight() / 2};
+    Vector2 position = {static_cast<float>(GetScreenWidth()) / 2 - 400, static_cast<float>(GetScreenHeight()) / 2};
     int speed{6};
     Rectangle frameRec{};
     int frameSpeed{4}, frameCounter{0}, currentFrame{0};

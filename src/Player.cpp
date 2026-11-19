@@ -12,7 +12,7 @@ void Player::Draw(bool facingLeft){
     }
 
     DrawTextureRec(texture, source,
-        Vector2{static_cast<float>(x), static_cast<float>(y)}, WHITE);
+        Vector2{static_cast<float>(position.x), static_cast<float>(position.y)}, WHITE);
 }
 
 void Player::Update(bool moving){
@@ -35,9 +35,9 @@ void Player::Update(bool moving){
 
 void Player::Shoot(bool facingLeft){
     bullets.emplace_back(Vector2{
-        facingLeft ? static_cast<float>(x) - 16.0f
-                   : static_cast<float>(x) + frameRec.width,
-        static_cast<float>(y) + frameRec.height / 2
+        facingLeft ? static_cast<float>(position.x) - 16.0f
+                   : static_cast<float>(position.x) + frameRec.width,
+        static_cast<float>(position.y) + frameRec.height / 2
     }, facingLeft);
 }
 
@@ -61,22 +61,23 @@ void Player::DrawBullets(){
 
 void Player::Collision(){
 
-if(y + frameRec.height >= GetScreenHeight()){
-	y = GetScreenHeight() - static_cast<int>(frameRec.height);
+if(position.y + frameRec.height >= GetScreenHeight()){
+	position.y = GetScreenHeight() - static_cast<int>(frameRec.height);
 }
-if(y <= 0){
-	y = 0;
+if(position.y <= 0){
+	position.y = 0;
 }
-if (x + frameRec.width >= GetScreenWidth()){
-	x = GetScreenWidth() - static_cast<int>(frameRec.width);
+if (position.x + frameRec.width >= GetScreenWidth()){
+	position.x = GetScreenWidth() - static_cast<int>(frameRec.width);
 }
-if (x <= 0){
-	x = 0;
+if (position.x <= 0){
+	position.x = 0;
 }
 }
 
-void Reset(){
-        
+void Player::Reset(){
+    position = {static_cast<float>(GetScreenWidth()) / 2 - 400, static_cast<float>(GetScreenHeight()) / 2};
+    bullets.clear();
 }
 
 Player::Player()
