@@ -81,6 +81,8 @@ void Game::Update(){
         left = false;
     }
 
+    player.x -= 3;
+    player.Collision();
     player.Update(moving);
 }
 
