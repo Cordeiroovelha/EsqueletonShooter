@@ -23,11 +23,11 @@ public:
     Bullet(Bullet&& other) noexcept;
     Bullet& operator=(Bullet&& other) noexcept;
 
-    void Update();
+    virtual void Update();
 
     void Draw();
 
-    ~Bullet();
+    virtual ~Bullet();
 };
 
 #endif

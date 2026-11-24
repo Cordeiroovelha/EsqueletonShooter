@@ -4,14 +4,24 @@
 #include <raylib.h>
 #include <array>
 #include <deque>
+#include <vector>
 #include "Player.hpp"
 #include "Enemy.hpp"
+#include "BulletEnemy.hpp"
 
 class Game {
 private:
     std::deque<Enemy> enemies;
     std::deque<float> enemyHitRespawnTimers;
+    std::deque<float> enemyShootTimers;
+    std::vector<BulletEnemy> enemyBullets;
     float enemySpawnTimer{0.0f};
+    double nextPlayerShotTime{0.0};
+    Sound shootSound{};
+    Sound deathSound{};
+    Sound enemyDeathSound{};
+    Music backgroundMusic{};
+    bool audioReady{false};
 public:
     Player player;
 
@@ -33,6 +43,10 @@ public:
     void CheckCollisionsWithBody();
 
     void EnemyColissionWhithBullet();
+
+    void EnemyColissionWhithWall();
+
+    void CheckCollisionsWithEnemyBullets();
 
     void GameOver();
 
